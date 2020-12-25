@@ -2,6 +2,10 @@ const express = require('express')
 const app = express()
 const port = 8080
 
+
+const { newsArticleModel } = require('./connector');
+
+
 const onePageArticleCount = 10
 
 
@@ -9,14 +13,18 @@ const onePageArticleCount = 10
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.get("/newFeeds",(req,res)=>{
-    let limit=Number(req.query.limit);
-    let offset=Number(req.query.offset);
-    limit= limit? limit : 10;
-    offset= offset? offset : 0;
 
-    newsArticleModel.find().skip(offset).limit(limit).then((data)=>res.send(data));
+app.get('/newFeeds', async (req,res) => {
+ res.send(await newsArticleModel.find().skip(sanitize(req.query.offset, 0)).limit(sanitize(req.query.limit , 10)));
 });
+
+const sanitize = (value,defaultValue) => {
+    if(value === null || value === undefined || isNaN(Number(value))) {
+        return defaultValue;
+    }
+    return Number(value);
+};
+
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 
