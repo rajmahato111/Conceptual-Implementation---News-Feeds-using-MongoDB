@@ -9,7 +9,14 @@ const onePageArticleCount = 10
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+app.get("/newFeeds",(req,res)=>{
+    let limit=Number(req.query.limit);
+    let offset=Number(req.query.offset);
+    limit= limit? limit : 10;
+    offset= offset? offset : 0;
 
+    newsArticleModel.find().skip(offset).limit(limit).then((data)=>res.send(data));
+});
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 
